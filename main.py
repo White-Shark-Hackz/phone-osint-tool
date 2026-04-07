@@ -3,22 +3,23 @@ from phonenumbers import geocoder, carrier, timezone
 from colorama import Fore, init
 import webbrowser
 from datetime import datetime
+import os
 
 init(autoreset=True)
 
 
-# 💀 HACKER BANNER
+# 💀 BANNER
 def banner():
     print(Fore.RED + r"""
- ██████╗  ██████╗ ██╗███╗   ██╗████████╗
+██████╗  ██████╗ ██╗███╗   ██╗████████╗
 ██╔═══██╗██╔════╝ ██║████╗  ██║╚══██╔══╝
 ██║   ██║██║  ███╗██║██╔██╗ ██║   ██║   
 ██║   ██║██║   ██║██║██║╚██╗██║   ██║   
 ╚██████╔╝╚██████╔╝██║██║ ╚████║   ██║   
  ╚═════╝  ╚═════╝ ╚═╝╚═╝  ╚═══╝   ╚═╝   
 
-        PHONE OSINT TOOL
-        by White-Shark-Hackz
+     HYBRID OSINT TOOL
+     by White-Shark-Hackz
 """)
 
 
@@ -50,8 +51,7 @@ def social_media_search(number):
         "Google": f"https://www.google.com/search?q={number}",
         "Facebook": f"https://www.facebook.com/search/top?q={number}",
         "Twitter": f"https://twitter.com/search?q={number}",
-        "LinkedIn": f"https://www.linkedin.com/search/results/all/?keywords={number}",
-        "Telegram": f"https://t.me/{number.replace('+','')}"
+        "LinkedIn": f"https://www.linkedin.com/search/results/all/?keywords={number}"
     }
 
     for name, url in links.items():
@@ -61,14 +61,11 @@ def social_media_search(number):
 
 # 📄 SAVE REPORT
 def save_report(number, data):
-    filename = "results.txt"
-
-    with open(filename, "a") as file:
-        file.write(f"\n=== Report ({datetime.now()}) ===\n")
-        file.write(f"Number: {number}\n")
+    with open("results.txt", "a") as file:
+        file.write(f"\n=== {number} ===\n")
         file.write(data)
 
-    print(Fore.GREEN + f"[✔] Report saved in {filename}")
+    print(Fore.GREEN + "[✔] Report saved")
 
 
 # 📂 BULK SCAN
@@ -79,33 +76,41 @@ def bulk_scan():
 
         for num in numbers:
             num = num.strip()
-            print(Fore.YELLOW + f"\n[+] Scanning: {num}")
+            print(Fore.YELLOW + f"\n[+] {num}")
             data = basic_info(num)
             save_report(num, data)
 
     except:
-        print(Fore.RED + "[!] numbers.txt file not found")
+        print(Fore.RED + "[!] numbers.txt not found")
+
+
+# 🧠 PHONEINFOGA
+def phoneinfoga_scan(number):
+    print(Fore.YELLOW + "\n[+] Running PhoneInfoga...\n")
+    
+    os.system(f"cd tools/phoneinfoga && python3 phoneinfoga.py -n {number}")
 
 
 # 🎯 MAIN MENU
 def main():
-    banner()  # 🔥 banner call
+    banner()
 
-    number = input("Enter phone number (+countrycode): ")
+    number = input("Enter phone number: ")
 
     while True:
         print(Fore.YELLOW + """
 1. Basic Info
-2. Social Media Search
+2. Social Media
 3. Save Report
-4. Bulk Scan (numbers.txt)
-5. Exit
+4. Bulk Scan
+5. PhoneInfoga Scan
+6. Exit
 """)
 
         choice = input("Select option: ")
 
         if choice == "1":
-            data = basic_info(number)
+            basic_info(number)
 
         elif choice == "2":
             social_media_search(number)
@@ -118,11 +123,14 @@ def main():
             bulk_scan()
 
         elif choice == "5":
-            print(Fore.RED + "Exiting...")
+            phoneinfoga_scan(number)
+
+        elif choice == "6":
+            print("Exit")
             break
 
         else:
-            print(Fore.RED + "Invalid choice")
+            print("Invalid option")
 
 
 if __name__ == "__main__":
